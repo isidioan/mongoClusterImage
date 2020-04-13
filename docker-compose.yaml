@@ -1,0 +1,272 @@
+version: '3'
+
+services:
+
+  mongoshardan1:
+
+    container_name: mongoshardan1
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongosharda --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30000:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./scripts:/scripts
+      - ./rsa1:/data/db
+
+  mongoshardan2:
+
+    container_name: mongoshardan2
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongosharda --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30001:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./rsa2:/data/db
+
+  mongoshardan3:
+
+    container_name: mongoshardan3
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongosharda --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30002:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./rsa3:/data/db
+      - ./mongodb.key:/mongodb.key
+
+  mongoshardbn1:
+
+    container_name: mongoshardbn1
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongoshardb --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30100:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./scripts:/scripts
+      - ./rsb1:/data/db
+
+  mongoshardbn2:
+
+    container_name: mongoshardbn2
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongoshardb --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30101:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./rsb2:/data/db
+
+  mongoshardbn3:
+
+    container_name: mongoshardbn3
+
+    image: mongo:3.6.6
+
+    command: mongod --shardsvr --replSet mongoshardb --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 30102:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./rsb3:/data/db
+
+  mongoconfig1:
+
+    container_name: mongoconfig1
+
+    image: mongo:3.6.6
+
+    command: mongod --configsvr --replSet conf --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 40000:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./scripts:/scripts
+      - ./config1:/data/db
+
+  mongoconfig2:
+
+    container_name: mongoconfig2
+
+    image: mongo:3.6.6
+
+    command: mongod --configsvr --replSet conf --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 40001:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./config2:/data/db
+
+  mongoconfig3:
+
+    container_name: mongoconfig3
+
+    image: mongo:3.6.6
+
+    command: mongod --configsvr --replSet conf --dbpath /data/db --port 27017 --keyFile /mongodb.key
+
+    ports:
+
+      - 40002:27017
+
+    expose:
+
+      - "27017"
+
+    environment:
+
+      TERM: xterm
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./config3:/data/db
+
+  mongos:
+
+    container_name: mongos
+
+    image: mongo:3.6.6
+
+    depends_on:
+
+      - mongoconfig1
+
+      - mongoconfig2
+
+      - mongoconfig3
+
+      - mongoshardan1
+
+      - mongoshardan2
+
+      - mongoshardan3
+
+      - mongoshardbn1
+
+      - mongoshardbn2
+
+      - mongoshardbn3
+
+    command: mongos --configdb conf/mongoconfig1:27017,mongoconfig2:27017,mongoconfig3:27017 --port 27017 --bind_ip_all --keyFile /mongodb.key
+
+    ports:
+
+      - 50000:27017
+
+    expose:
+
+      - "27017"
+
+    volumes:
+
+      - ./mongodb.key:/mongodb.key
+      - ./scripts:/scripts
